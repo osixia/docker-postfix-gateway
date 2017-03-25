@@ -1,0 +1,100 @@
+#######################
+## GENERALS SETTINGS ##
+#######################
+
+smtpd_banner         = $myhostname ESMTP $mail_name (Debian/GNU)
+biff                 = no
+append_dot_mydomain  = no
+readme_directory     = no
+delay_warning_time   = 4h
+disable_vrfy_command = yes
+message_size_limit   = 52428800
+mailbox_size_limit   = 1024000000
+
+inet_interfaces = all
+inet_protocols = ipv4
+smtp_bind_address = {{ POSTFIX_GATEWAY_SMTP_BIND_ADDRESS }}
+
+myhostname    = {{ HOSTNAME }}
+myorigin      = $mydomain
+mydestination =
+local_recipient_maps =
+local_transport = error:local mail delivery is disabled
+mynetworks    = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128 {{ POSTFIX_GATEWAY_MYNETWORKS }}
+
+####################
+## TLS PARAMETERS ##
+####################
+
+# SMTP ( OUTGOING )
+# ----------------------------------------------------------------------
+smtp_tls_loglevel               = 1
+smtp_tls_security_level         = may
+smtp_tls_CAfile                 = {{ POSTFIX_GATEWAY_SSL_CA_CRT_PATH }}
+smtp_tls_session_cache_database = btree:${data_directory}/smtp_scache
+
+# SMTPD ( INCOMING )
+# ----------------------------------------------------------------------
+smtpd_tls_loglevel            = 1
+smtpd_tls_auth_only           = yes
+smtpd_tls_security_level      = may
+smtpd_tls_received_header     = yes
+smtpd_tls_mandatory_protocols = !SSLv2, !SSLv3, TLSv1
+smtpd_tls_mandatory_ciphers   = high
+smtpd_tls_exclude_ciphers     = aNULL, eNULL, EXPORT, DES, RC4, MD5, PSK, aECDH, EDH-DSS-DES-CBC3-SHA, EDH-RSA-DES-CDB3-SHA, KRB5-DES, CBC3-SHA
+
+tls_random_source = dev:/dev/urandom
+
+# TLS PUBLIC CERTIFICATES AND PRIVATE KEY
+smtpd_tls_CAfile    = {{ POSTFIX_GATEWAY_SSL_CA_CRT_PATH }}
+smtpd_tls_cert_file = {{ POSTFIX_GATEWAY_SSL_CRT_PATH }}
+smtpd_tls_key_file  = {{ POSTFIX_GATEWAY_SSL_KEY_PATH }}
+
+# TLS/LMTP SESSION CACHE DATABASES
+smtpd_tls_session_cache_database = btree:${data_directory}/smtpd_scache
+lmtp_tls_session_cache_database  = btree:${data_directory}/lmtp_scache
+
+# CYPHERS AND CURVE PARAMETERS
+smtpd_tls_eecdh_grade  = ultra
+tls_eecdh_strong_curve = prime256v1
+tls_eecdh_ultra_curve  = secp384r1
+
+# DIFFIE-HELLMAN PARAMETERS
+smtpd_tls_dh1024_param_file = {{ POSTFIX_GATEWAY_SSL_DHPARAM_1024_PATH }}
+smtpd_tls_dh512_param_file  = {{ POSTFIX_GATEWAY_SSL_DHPARAM_512_PATH }}
+
+# ----------------------------------------------------------------------
+
+######################
+## ERRORS REPORTING ##
+######################
+
+# notify_classes = bounce, delay, resource, software
+notify_classes = resource, software
+
+##################
+## RESTRICTIONS ##
+##################
+
+smtpd_recipient_restrictions =
+     permit_mynetworks,
+     reject_non_fqdn_recipient,
+     reject_unauth_destination,
+     reject_unknown_recipient_domain,
+     reject_rbl_client zen.spamhaus.org
+
+smtpd_helo_restrictions =
+     permit_mynetworks,
+     reject_invalid_helo_hostname,
+     reject_non_fqdn_helo_hostname
+     # reject_unknown_helo_hostname
+
+smtpd_client_restrictions =
+     permit_mynetworks,
+     permit_inet_interfaces
+     # reject_plaintext_session,
+     # reject_unauth_pipelining
+
+smtpd_sender_restrictions =
+     reject_non_fqdn_sender,
+     reject_unknown_sender_domain
