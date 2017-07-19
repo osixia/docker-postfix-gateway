@@ -46,6 +46,11 @@ if [ ! -e "$FIRST_START_DONE" ]; then
   sed -i "s|{{ POSTFIX_GATEWAY_SSL_DHPARAM_1024_PATH }}|${POSTFIX_GATEWAY_SSL_DHPARAM_1024_PATH}|g" ${CONTAINER_SERVICE_DIR}/postfix/assets/config/main.cf
 
 
+  if [ "${POSTFIX_GATEWAY_LOG_TO_STDOUT,,}" == "true" ]; then
+    touch /var/log/mail.log
+    ln -sf /proc/1/fd/1 /var/log/mail.log
+  fi
+
   touch $FIRST_START_DONE
 fi
 
