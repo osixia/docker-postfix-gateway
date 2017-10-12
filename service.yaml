@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ STUDIO_DEPLOYMENT_NAME }}
+  namespace: {{ STUDIO_DEPLOYMENT_NAMESPACE }}
+  labels:
+    app: {{ STUDIO_DEPLOYMENT_NAME }}
+    type: service
+spec:
+  ports:
+    - port: 443
+  selector:
+    app: {{ STUDIO_DEPLOYMENT_NAME }}
+    type: service

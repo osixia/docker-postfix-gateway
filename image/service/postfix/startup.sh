@@ -15,10 +15,16 @@ if [ ! -e "$FIRST_START_DONE" ]; then
   sed -i "s|{{ POSTFIX_GATEWAY_SMTP_PORT }}|${POSTFIX_GATEWAY_SMTP_PORT}|g" ${CONTAINER_SERVICE_DIR}/postfix/assets/config/master.cf
 
   # set mailserver hostname
-  sed -i "s|{{ HOSTNAME }}|${HOSTNAME}|g" ${CONTAINER_SERVICE_DIR}/postfix/assets/config/main.cf
+  export POSTFIX_GATEWAY_HOSTNAME=${POSTFIX_GATEWAY_HOSTNAME:-${HOSTNAME}}
+  export CFSSL_HOSTNAME=${CFSSL_HOSTNAME:-${POSTFIX_GATEWAY_HOSTNAME}}
+  export JSONSSL_HOSTNAME=${CFSSL_HOSTNAME:-${POSTFIX_GATEWAY_HOSTNAME}}
+  sed -i "s|{{ POSTFIX_GATEWAY_HOSTNAME }}|${POSTFIX_GATEWAY_HOSTNAME}|g" ${CONTAINER_SERVICE_DIR}/postfix/assets/config/main.cf
 
   # mynetworks
   sed -i "s|{{ POSTFIX_GATEWAY_MYNETWORKS }}|${POSTFIX_GATEWAY_MYNETWORKS}|g" ${CONTAINER_SERVICE_DIR}/postfix/assets/config/main.cf
+
+  # best_mx_transport
+  sed -i "s|{{ POSTFIX_GATEWAY_BEST_MX_TRANSPORT }}|${POSTFIX_GATEWAY_BEST_MX_TRANSPORT}|g" ${CONTAINER_SERVICE_DIR}/postfix/assets/config/main.cf
 
   # smtp bind address
   sed -i "s|{{ POSTFIX_GATEWAY_SMTP_BIND_ADDRESS }}|${POSTFIX_GATEWAY_SMTP_BIND_ADDRESS}|g" ${CONTAINER_SERVICE_DIR}/postfix/assets/config/main.cf
@@ -45,10 +51,13 @@ if [ ! -e "$FIRST_START_DONE" ]; then
   sed -i "s|{{ POSTFIX_GATEWAY_SSL_DHPARAM_512_PATH }}|${POSTFIX_GATEWAY_SSL_DHPARAM_512_PATH}|g" ${CONTAINER_SERVICE_DIR}/postfix/assets/config/main.cf
   sed -i "s|{{ POSTFIX_GATEWAY_SSL_DHPARAM_1024_PATH }}|${POSTFIX_GATEWAY_SSL_DHPARAM_1024_PATH}|g" ${CONTAINER_SERVICE_DIR}/postfix/assets/config/main.cf
 
+  touch /var/log/mail.log
 
-  if [ "${POSTFIX_GATEWAY_LOG_TO_STDOUT,,}" == "true" ]; then
-    touch /var/log/mail.log
+  if [ "${POSTFIX_GATEWAY_LOG_TO,,}" == "stdout" ]; then
     ln -sf /proc/1/fd/1 /var/log/mail.log
+  elif [ "${POSTFIX_GATEWAY_LOG_TO,,}" == "both" ]; then
+    [ -d /container/run/process/postfix-log-forwarder ] || mkdir -p /container/run/process/postfix-log-forwarder
+    ln -sf ${CONTAINER_SERVICE_DIR}/postfix/process-log-forwarder.sh /container/run/process/postfix-log-forwarder/run
   fi
 
   touch $FIRST_START_DONE
