@@ -1,0 +1,64 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ STUDIO_DEPLOYMENT_NAME }}
+  namespace: {{ STUDIO_DEPLOYMENT_NAMESPACE }}
+  labels:
+    app: {{ STUDIO_DEPLOYMENT_NAME }}
+    type: service
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ STUDIO_DEPLOYMENT_NAME }}
+        type: service
+    spec:
+      automountServiceAccountToken: false
+      initContainers:
+        - name: www-init
+          image: osixia/ssl-helper:0.2.1
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: ssl-helper-env-volume
+              mountPath: /container/environment/01-custom
+            - name: https-certs-volume
+              mountPath: /ssl-helper/certs/https
+          env:
+            - name: CFSSL_HOSTNAME
+              value: "{{ STUDIO_DEPLOYMENT_NAME }}" #same as service name
+            - name: SSL_HELPER_PREFIX_TO_GENERATE
+              value: "https"
+            - name: HTTPS_CFSSL_PROFILE
+              value: "server"
+            - name: HTTPS_SSL_HELPER_CERT_FILE
+              value: "/ssl-helper/certs/https/cert.crt"
+            - name: HTTPS_SSL_HELPER_KEY_FILE
+              value: "/ssl-helper/certs/https/cert.key"
+            - name: HTTPS_SSL_HELPER_CA_FILE
+              value: "/ssl-helper/certs/https/ca.crt"
+      containers:
+        - name: www
+          image: {{ DOCKER_IMAGE }}
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: 64Mi
+          ports:
+            - containerPort: 443
+          volumeMounts:
+            - name: https-certs-volume
+              mountPath: /container/service/nginx/assets/certs
+          env:
+            - name: SSL_CRT_FILENAME
+              value: "cert.crt"
+            - name: SSL_KEY_FILENAME
+              value: "cert.key"
+            - name: SSL_CA_CRT_FILENAME
+              value: "ca.crt"
+      volumes:
+        - name: "ssl-helper-env-volume"
+          secret:
+            secretName: "ssl-helper-env-secret"
+        - name: "https-certs-volume"
+          emptyDir: {}

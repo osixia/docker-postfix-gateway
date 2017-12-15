@@ -2,7 +2,7 @@
 ## GENERALS SETTINGS ##
 #######################
 
-smtpd_banner         = $myhostname ESMTP $mail_name (Debian/GNU)
+smtpd_banner         = {{ POSTFIX_GATEWAY_HOSTNAME }} ESMTP $mail_name (Debian/GNU)
 biff                 = no
 append_dot_mydomain  = no
 readme_directory     = no
@@ -15,12 +15,22 @@ inet_interfaces = all
 inet_protocols = ipv4
 smtp_bind_address = {{ POSTFIX_GATEWAY_SMTP_BIND_ADDRESS }}
 
-myhostname    = {{ HOSTNAME }}
-myorigin      = $mydomain
+mydomain      = localhost
+myorigin      = localhost
 mydestination =
 local_recipient_maps =
 local_transport = error:local mail delivery is disabled
-mynetworks    = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128 {{ POSTFIX_GATEWAY_MYNETWORKS }}
+mynetworks    = 127.0.0.0/8  [::1]/128 [fe80::]/64 {{ POSTFIX_GATEWAY_MYNETWORKS }}
+
+relayhost     =
+relay_domains =
+
+best_mx_transport = {{ POSTFIX_GATEWAY_BEST_MX_TRANSPORT }}
+
+lmtp_lhlo_name = {{ POSTFIX_GATEWAY_HOSTNAME }}
+milter_macro_daemon_name = {{ POSTFIX_GATEWAY_HOSTNAME }}
+smtp_helo_name = {{ POSTFIX_GATEWAY_HOSTNAME }}
+smtpd_proxy_ehlo = {{ POSTFIX_GATEWAY_HOSTNAME }}
 
 ####################
 ## TLS PARAMETERS ##
