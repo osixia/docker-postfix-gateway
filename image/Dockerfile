@@ -1,6 +1,6 @@
 # Use osixia/light-baseimage
 # sources: https://github.com/osixia/docker-light-baseimage
-FROM osixia/light-baseimage:1.1.1
+FROM osixia/light-baseimage:1.1.2
 MAINTAINER Bertrand Gouny <bertrand.gouny@osixia.net>
 
 # Install postfix
