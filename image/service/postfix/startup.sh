@@ -15,9 +15,6 @@ if [ ! -e "$FIRST_START_DONE" ]; then
   sed -i "s|{{ POSTFIX_GATEWAY_SMTP_PORT }}|${POSTFIX_GATEWAY_SMTP_PORT}|g" ${CONTAINER_SERVICE_DIR}/postfix/assets/config/master.cf
 
   # set mailserver hostname
-  export POSTFIX_GATEWAY_HOSTNAME=${POSTFIX_GATEWAY_HOSTNAME:-${HOSTNAME}}
-  export CFSSL_HOSTNAME=${CFSSL_HOSTNAME:-${POSTFIX_GATEWAY_HOSTNAME}}
-  export JSONSSL_HOSTNAME=${CFSSL_HOSTNAME:-${POSTFIX_GATEWAY_HOSTNAME}}
   sed -i "s|{{ POSTFIX_GATEWAY_HOSTNAME }}|${POSTFIX_GATEWAY_HOSTNAME}|g" ${CONTAINER_SERVICE_DIR}/postfix/assets/config/main.cf
 
   # mynetworks
