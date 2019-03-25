@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## 0.2.2 - Unreleased
 ### Changed
   - Upgrade baseimage to light-baseimage:1.1.2
+  - log to /dev/stdout
+  - Update postfix config
 
 ## 0.2.1 - 2017-12-15
 ### Added 

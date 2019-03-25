@@ -51,7 +51,7 @@ if [ ! -e "$FIRST_START_DONE" ]; then
   touch /var/log/mail.log
 
   if [ "${POSTFIX_GATEWAY_LOG_TO,,}" == "stdout" ]; then
-    ln -sf /proc/1/fd/1 /var/log/mail.log
+    ln -sf /dev/stdout /var/log/mail.log
   elif [ "${POSTFIX_GATEWAY_LOG_TO,,}" == "both" ]; then
     [ -d /container/run/process/postfix-log-forwarder ] || mkdir -p /container/run/process/postfix-log-forwarder
     ln -sf ${CONTAINER_SERVICE_DIR}/postfix/process-log-forwarder.sh /container/run/process/postfix-log-forwarder/run
