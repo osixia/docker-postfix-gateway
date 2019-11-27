@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.3.0
+  - Upgrade baseimage to light-baseimage:1.2.0 (debian buster)
+
 ## 0.2.1
   - Update postfix chroot conf
   - Upgrade baseimage: light-baseimage:1.1.1

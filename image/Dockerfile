@@ -1,14 +1,13 @@
 # Use osixia/light-baseimage
 # sources: https://github.com/osixia/docker-light-baseimage
-FROM osixia/light-baseimage:1.1.1
-MAINTAINER Bertrand Gouny <bertrand.gouny@osixia.net>
+FROM osixia/light-baseimage:release-1.2.0-dev
 
 # Install postfix
 RUN apt-get update \
     && /container/tool/add-multiple-process-stack \
     && /container/tool/add-service-available :ssl-tools \
     && LC_ALL=C DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-       postfix postfix-pcre ca-certificates \
+    postfix postfix-pcre ca-certificates \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
