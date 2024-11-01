@@ -90,8 +90,7 @@ smtpd_recipient_restrictions =
      permit_mynetworks,
      reject_non_fqdn_recipient,
      reject_unauth_destination,
-     reject_unknown_recipient_domain,
-     reject_rbl_client zen.spamhaus.org
+     reject_unknown_recipient_domain
 
 smtpd_helo_restrictions =
      permit_mynetworks,
